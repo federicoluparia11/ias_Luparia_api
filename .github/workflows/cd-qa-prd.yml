@@ -1,0 +1,40 @@
+name: CD - Deploy a QA y PRD
+
+# Se ejecuta automaticamente luego del merge a main (estandar IAS)
+# QA se despliega automaticamente; PRD requiere aprobacion manual
+# del Release Manager (environment "production" con required reviewers)
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-qa:
+    name: Deploy automatico a QA (Render)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar deploy hook de Render (QA)
+        run: |
+          curl --fail --silent --show-error -X POST "$DEPLOY_HOOK"
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_QA }}
+
+      - name: Confirmacion
+        run: echo "Deploy a QA disparado correctamente"
+
+  deploy-prd:
+    name: Deploy a PRD (requiere aprobacion manual)
+    needs: deploy-qa
+    runs-on: ubuntu-latest
+    # Este environment tiene "Required reviewers" activado en GitHub:
+    # el job queda en espera hasta que el Release Manager apruebe
+    environment: production
+    steps:
+      - name: Disparar deploy hook de Render (PRD)
+        run: |
+          curl --fail --silent --show-error -X POST "$DEPLOY_HOOK"
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_PRD }}
+
+      - name: Confirmacion
+        run: echo "Deploy a PRD aprobado y disparado correctamente"

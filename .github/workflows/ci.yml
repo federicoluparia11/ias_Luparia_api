@@ -1,0 +1,84 @@
+name: CI - Integracion Continua
+
+# Se ejecuta al crear/actualizar Pull Requests hacia develop o main (estandar IAS)
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  tests-unitarios:
+    name: Tests unitarios
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Ejecutar tests unitarios
+        run: pytest tests/unit -v
+
+  tests-integracion:
+    name: Tests de integracion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Ejecutar tests de integracion
+        run: pytest tests/integration -v
+
+  analisis-bandit:
+    name: Analisis de seguridad estatico (Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar Bandit
+        run: pip install bandit
+
+      # Falla el pipeline si hay hallazgos de severidad media o alta
+      - name: Ejecutar Bandit sobre el codigo de la API
+        run: bandit -r app run.py -ll -v
+
+  tests-seguridad:
+    name: Tests de seguridad (solo PR develop -> main)
+    # Requisito IAS: los tests de seguridad solo corren en el PR hacia main
+    if: github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Ejecutar tests de seguridad
+        run: pytest tests/security -v

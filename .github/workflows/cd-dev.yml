@@ -1,0 +1,21 @@
+name: CD - Deploy a DEV
+
+# Se ejecuta automaticamente luego del merge a develop (estandar IAS)
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy-dev:
+    name: Deploy automatico a DEV (Render)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar deploy hook de Render (DEV)
+        run: |
+          curl --fail --silent --show-error -X POST "$DEPLOY_HOOK"
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_DEV }}
+
+      - name: Confirmacion
+        run: echo "Deploy a DEV disparado correctamente"
