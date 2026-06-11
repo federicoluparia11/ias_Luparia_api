@@ -1,8 +1,7 @@
-# ias_apellido_api
+# ias_Luparia_api
 
 API REST de gestion de usuarios (ABM) desarrollada para el cliente ficticio de la empresa **IAS**, con pipeline completo de CI/CD.
 
-> Reemplazar `apellido` por tu apellido real en el nombre del repositorio.
 
 ## Stack
 
