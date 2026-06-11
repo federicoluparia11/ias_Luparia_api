@@ -15,11 +15,14 @@ def healthcheck():
         {
             "status": "ok",
             "service": "ias-api-usuarios",
+            "version": "1.1.0",
             "environment": current_app.config.get("ENV_NAME", "local"),
         }
     ), 200
+        
 
 
+        
 @api.get("/usuarios")
 def listar_usuarios():
     """Lista todos los usuarios."""
