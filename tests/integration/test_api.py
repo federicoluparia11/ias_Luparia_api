@@ -6,6 +6,7 @@ def test_healthcheck(client):
     assert respuesta.status_code == 200
     datos = respuesta.get_json()
     assert datos["status"] == "ok"
+    assert datos["version"] == "1.1.0"
     assert "environment" in datos
 
 
